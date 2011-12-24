@@ -1,0 +1,35 @@
+# Maintainer: Baho Utot <baho-utot@columbus.rr.com>
+_prefix="/usr"
+_builddir=${srcdir}/BUILD
+pkgname=tqtinterface
+pkgver=3.5.13
+pkgrel=00
+arch=(i686 x86_64)
+url="http://trinity.pearsoncomputing.net"
+license=(GPL2)
+groups=(trinity)
+pkgdesc="Trinity - ${pkgname}"
+depends=(qt3)
+makedepends=(cmake)
+options=()
+source=(http://anduin.linuxfromscratch.org/sources/trinity/$pkgname-$pkgver.tar.gz)
+
+build() {
+	msg "Building revision $pkgver"
+	mkdir -vp ${srcdir}/BUILD
+	cd ${srcdir}/BUILD
+	msg "Starting cmake..."
+	cmake ${srcdir}/dependencies/${pkgname}/ \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DQT_INCLUDE_DIR=${_prefix}/include/qt \
+		-DQT_VERSION=3 \
+		-DBUILD_ALL=ON
+	make
+}
+
+package() {
+	msg "Packaging - $pkgname-$pkgver"
+	cd ${srcdir}/BUILD
+	make DESTDIR="$pkgdir/" install
+}
+md5sums=('d54cc9fd0b35555298efd17c32471a2b')

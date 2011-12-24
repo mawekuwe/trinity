@@ -1,0 +1,29 @@
+# Maintainer: Baho Utot <baho-utot@columbus.rr.com>
+pkgname=arts
+pkgver=3.5.13
+pkgrel=00
+arch=(i686 x86_64)
+url="http://trinity.pearsoncomputing.net"
+license=(GPL2)
+groups=(trinity)
+pkgdesc="Trinity - ${pkgname}"
+depends=(glib2 libmad libvorbis audiofile tqtinterface bash)
+makedepends=(cmake)
+options=()
+source=( http://anduin.linuxfromscratch.org/sources/trinity/$pkgname-$pkgver.tar.gz)
+build() {
+	msg "Building revision $pkgver"
+	mkdir -vp ${srcdir}/BUILD
+	cd ${srcdir}/BUILD
+	msg "Starting cmake..."
+	cmake ${srcdir}/dependencies/${pkgname}/ \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_SKIP_RPATH=OFF
+	make
+}
+package() {
+	msg "Packaging - $pkgname-$pkgver"
+	cd ${srcdir}/BUILD
+	make DESTDIR="$pkgdir/" install
+}
+md5sums=('109124dabb1aaa9d44eb32e43b549142')
