@@ -1,6 +1,4 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-_prefix="/usr"
-_builddir=${srcdir}/BUILD
 pkgname=tqtinterface
 pkgver=3.5.13
 pkgrel=00
@@ -12,24 +10,36 @@ pkgdesc="Trinity - ${pkgname}"
 depends=(qt3)
 makedepends=(cmake)
 options=()
-source=(http://anduin.linuxfromscratch.org/sources/trinity/$pkgname-$pkgver.tar.gz)
+source=($pkgname-$pkgver.tar.xz)
+
+mksource() {
+	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
+	pushd ${pkgname}
+		git submodule init
+		git submodule update
+		git checkout v3.5.13
+	popd
+	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
+	rm -fr ${pkgname}
+}
 
 build() {
 	msg "Building revision $pkgver"
 	mkdir -vp ${srcdir}/BUILD
 	cd ${srcdir}/BUILD
 	msg "Starting cmake..."
-	cmake ${srcdir}/dependencies/${pkgname}/ \
+#	cmake ${srcdir}/dependencies/${pkgname}/ \
+	cmake ${srcdir}/${pkgname}/ \
 		-DCMAKE_INSTALL_PREFIX=/usr \
-		-DQT_INCLUDE_DIR=${_prefix}/include/qt \
+		-DQT_INCLUDE_DIR=/usr/include/qt \
 		-DQT_VERSION=3 \
 		-DBUILD_ALL=ON
 	make
 }
+#		-DQT_INCLUDE_DIR=${_prefix}/include/qt \
 
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/BUILD
 	make DESTDIR="$pkgdir/" install
 }
-md5sums=('d54cc9fd0b35555298efd17c32471a2b')

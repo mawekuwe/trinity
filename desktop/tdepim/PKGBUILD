@@ -1,16 +1,18 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-pkgname=arts
+pkgname=kdepim
 pkgver=3.5.13
 pkgrel=00
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 url="http://trinity.pearsoncomputing.net"
-license=(GPL2)
-groups=(trinity)
+license=('GPL2')
+groups=('trinity')
 pkgdesc="Trinity - ${pkgname}"
-depends=(glib2 libmad libvorbis audiofile tqtinterface bash)
+depends=(gpgme libical desktop-file-utils kdelibs boost)
 makedepends=(cmake)
-options=()
-source=($pkgname-$pkgver.tar.xz)
+optdepends=( )
+options=(!makeflags)
+source=( ${pkgname}-${pkgver}.tar.gz)
+install=install
 
 mksource() {
 	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
@@ -24,17 +26,21 @@ mksource() {
 }
 
 build() {
-	msg "Building revision $pkgver"
 	mkdir -vp ${srcdir}/BUILD
 	cd ${srcdir}/BUILD
 	msg "Starting cmake..."
 	cmake ${srcdir}/${pkgname}/ \
 		-DCMAKE_INSTALL_PREFIX=/usr \
-		-DCMAKE_SKIP_RPATH=OFF
+		-DBUILD_ALL=ON \
+		-DWITH_SASL=ON \
+		-DWITH_ARTS=ON \
+		-DCMAKE_SKIP_RPATH=ON
 	make
 }
+
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/BUILD
 	make DESTDIR="$pkgdir/" install
+	rm -rf ${pkgdir}/usr/share/doc
 }

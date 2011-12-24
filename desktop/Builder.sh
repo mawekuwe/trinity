@@ -7,8 +7,8 @@ _chroot="/home/chroot"
 _date=$(date +%F)"-"$(date +%R)
 _repos="/home/chroot/root/repo"
 _pkgname="*.pkg.tar*"
-_list=(kdelibs kdebase kdeaccessibility kdeutils kdemultimedia kdeadmin kdeartwork kdegames kdetoys kdeedu kdevelop kdeaddons kdepim kdesdk)
-_broken=(kdebindings kdenetwork kdegraphics kdewebdev)
+_list=(tdelibs tdebase tdeaccessibility tdeutils tdemultimedia tdeadmin tdeartwork tdegames tdetoys tdeedu tdevelop tdeaddons tdepim tdesdk)
+_broken=(tdebindings tdenetwork tdegraphics tdewebdev)
 for i in ${_list[@]}; do
 	echo ${i}
 	pushd ${i}
@@ -18,7 +18,7 @@ for i in ${_list[@]}; do
 			rm build.log namcap.log filelist.log || true
 			echo "Building---> ${pkgname}-${pkgver}-${pkgrel} ${i}"
 			( sudo /usr/sbin/mkarchroot -u  ${_chroot}/root |& tee	  build.log )
-			( sudo /usr/sbin/makechrootpkg -c -r ${_chroot} -- -skipinteg |& tee -a build.log )
+			( sudo /usr/sbin/makechrootpkg -c -r ${_chroot} -- --skipinteg |& tee -a build.log )
 			#	Namcap package
 			_pkg=$(echo *.pkg.*)
 			[ -f ${_pkg} ] || ( echo "Missing package: ${_pkgname}";exit 4 )

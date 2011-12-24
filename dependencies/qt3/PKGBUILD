@@ -13,8 +13,19 @@ optdepends=( )
 options=( )
 provides=(qt3 qt3-enhanced)
 conflicts=(qt3 qt3-enhanced)
-source=(http://anduin.linuxfromscratch.org/sources/trinity/$pkgname-$pkgver.tar.gz)
-#	http://anduin.linuxfromscratch.org/sources/trinity/qt-3.3.8.d-libpng15-1.patch)
+source=($pkgname-$pkgver.tar.xz)
+
+mksource() {
+	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
+	pushd ${pkgname}
+		git submodule init
+		git submodule update
+		git checkout v3.5.13
+	popd
+	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
+	rm -fr ${pkgname}
+}
+
 build() {
 	cd "${srcdir}/${pkgname}"
 	export PATH=${PWD}/bin:${PATH}
@@ -79,5 +90,3 @@ package() {
 	install -vdm 0755 		${pkgdir}/etc/ld.so.conf.d
 	echo "/usr/lib" > 		${pkgdir}/etc/ld.so.conf.d/qt3.conf
 }
-md5sums=('78dc675e84aed595375449818cbb589a')
-
