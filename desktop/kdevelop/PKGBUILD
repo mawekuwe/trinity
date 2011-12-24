@@ -12,11 +12,11 @@ makedepends=(cmake)
 optdepends=(graphviz)
 options=(!docs)
 install=kdevelop.install
-source=( 	$_pkgname-$pkgver.tar.gz
+source=( 	$pkgname-$pkgver.tar.gz
 		listeditor-ui.diff
 		CMakeLists-repair.patch)
 build() {
-	cd ${srcdir}/${_pkgname}
+	cd ${srcdir}/${pkgname}
 	patch -Np0 -i ${srcdir}/listeditor-ui.diff
 	#patch -Np0 -i ${srcdir}/CMakeLists-repair.patch
 	mkdir -vp ${srcdir}/BUILD

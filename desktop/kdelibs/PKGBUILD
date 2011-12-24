@@ -14,7 +14,7 @@ depends=(libart-lgpl jasper openexr aspell libtiff
 makedepends=(cmake)
 optdepends=('pmount: mount removable devices as normal user')
 options=()
-install='kdelibs.install'
+install=${pkgname}.install
 _trinity.sh() {
 	#	Build trinity.sh
 	install -d -m755 ${pkgdir}/etc/profile.d/
@@ -27,6 +27,16 @@ _trinity.sh() {
 	echo 'XDG_CONFIG_DIRS=${KDEDIR}/etc/xdg:${XDG_CONFIG_DIRS:=}' >> ${pkgdir}/etc/profile.d/trinity.sh
 	echo 'XDG_CONFIG_DIRS=${XDG_CONFIG_DIRS%:}' >> ${pkgdir}/etc/profile.d/trinity.sh
 }
+
+mksource() {
+	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
+	pushd ${pkgname}
+		git checkout v3.5.13
+	popd
+	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
+}
+
+
 build() {
 	msg "Building revision $pkgver"
 	export KDECONFIG=kde-config

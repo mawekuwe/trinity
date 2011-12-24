@@ -15,7 +15,7 @@ optdepends=('pciutils: PCI bus configuration space access library and tools'
 	'xscreensaver: Screen saver and locker for the X Window System')
 options=()
 install='kdebase.install'
-source=(Xsession kdmrc kdm-crypt.patch $_pkgname-$pkgver.tar.gz)
+source=(Xsession kdmrc kdm-crypt.patch $pkgname-$pkgver.tar.gz)
 _trinity.desktop () {
 	# create/install desktop
 	install -d -m755 ${pkgdir}/etc/X11/sessions

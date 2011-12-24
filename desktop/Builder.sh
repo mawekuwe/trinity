@@ -18,7 +18,7 @@ for i in ${_list[@]}; do
 			rm build.log namcap.log filelist.log || true
 			echo "Building---> ${pkgname}-${pkgver}-${pkgrel} ${i}"
 			( sudo /usr/sbin/mkarchroot -u  ${_chroot}/root |& tee	  build.log )
-			( sudo /usr/sbin/makechrootpkg -c -r ${_chroot} |& tee -a build.log )
+			( sudo /usr/sbin/makechrootpkg -c -r ${_chroot} -- -skipinteg |& tee -a build.log )
 			#	Namcap package
 			_pkg=$(echo *.pkg.*)
 			[ -f ${_pkg} ] || ( echo "Missing package: ${_pkgname}";exit 4 )
