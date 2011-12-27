@@ -1,0 +1,83 @@
+# Maintainer: Baho Utot <baho-utot@columbus.rr.com>
+pkgname=qt3
+pkgver=3.3.8.d
+pkgrel=00
+arch=('i686' 'x86_64')
+url="http://qt.nokia.com/products/"
+license=('GPL2')
+groups=('trinity')
+pkgdesc="Trinity - qt library"
+depends=(libjpeg-turbo libpng libmng libxmu libxft libxcursor libxinerama libxrandr mesa libxi)
+makedepends=( )
+optdepends=( )
+options=( )
+provides=(qt3 qt3-enhanced)
+conflicts=(qt3 qt3-enhanced)
+source=(http://anduin.linuxfromscratch.org/sources/trinity/$pkgname-$pkgver.tar.gz)
+#	http://anduin.linuxfromscratch.org/sources/trinity/qt-3.3.8.d-libpng15-1.patch)
+build() {
+	cd "${srcdir}/${pkgname}"
+	export PATH=${PWD}/bin:${PATH}
+	export LD_LIBRARY_PATH=${PWD}/lib:${LD_LIBRARY_PATH}
+	#
+	#	uncomment for libpnf-1.5
+	#patch -Np1 -i ${srcdir}/qt-3.3.8.d-libpng15-1.patch
+	#
+	#	uncomment if you want mysql and postgresql support
+	#		add postgresql and libmysql to the dependency list
+	# export CPATH=/usr/include/postgresql/server:/usr/include/mysql
+	#
+	# remove runtime library search not needed when installed into /usr
+	sed -i '/QMAKE_RPATH/d' mkspecs/linux*/qmake.conf
+	sed -i 's|-cp -P -f|-cp -L -f|' qmake/Makefile.unix
+	sed -i "s|read acceptance|acceptance=yes|" configure
+	#
+	#	Remove mkspecs not needed
+	rm -rf mkspecs/{*aix*,*bsd*,cygwin*,dgux*,darwin*,hpux*,hurd*,irix*,lynxos*,macx*,qnx*,reliant*,sco*,solaris*,tru64*,unixware*,win32*}
+	msg "Starting configure..."
+	./configure \
+		-prefix /usr \
+		-bindir /usr/bin \
+		-libdir /usr/lib \
+		-docdir /usr/share/doc/qt \
+		-headerdir /usr/include/qt \
+		-plugindir /usr/lib/qt/plugins \
+		-datadir /usr/share/qt \
+		-translationdir /usr/share/qt/translations \
+		-sysconfdir /etc \
+		-qt-gif \
+		-system-zlib \
+		-system-libpng \
+		-system-libjpeg \
+		-system-libmng \
+		-plugin-imgfmt-png \
+		-plugin-imgfmt-jpeg \
+		-plugin-imgfmt-mng \
+		-no-exceptions \
+		-thread \
+		-tablet
+	make sub-tools
+}
+package() {
+	msg "Packaging - $pkgname-$pkgver"
+	cd "${srcdir}/${pkgname}"
+	make INSTALL_ROOT=${pkgdir} install
+	#
+	#	Fixup environment
+	install -vdm 755 		${pkgdir}/usr/share/qt
+	ln -v -sf libqt-mt.so 		${pkgdir}/usr/lib/libqt.so
+	ln -v -snf /usr/bin		${pkgdir}/usr/share/qt/bin
+	ln -v -snf /usr/include/qt	${pkgdir}/usr/share/qt/include
+	ln -v -snf /usr/lib		${pkgdir}/usr/share/qt/lib
+	find ${pkgdir}/usr -type l -name linux-g++ -delete
+	#
+	#	docs and examples
+	#cp -v -r doc/man		${pkgdir}/usr/share
+	#cp -v -r examples		${pkgdir}/usr/share/doc/qt
+	#
+	#	Fixup linker search path
+	install -vdm 0755 		${pkgdir}/etc/ld.so.conf.d
+	echo "/usr/lib" > 		${pkgdir}/etc/ld.so.conf.d/qt3.conf
+}
+md5sums=('78dc675e84aed595375449818cbb589a')
+
