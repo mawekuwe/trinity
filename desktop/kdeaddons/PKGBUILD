@@ -1,5 +1,5 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-pkgname=<PKGNAME>
+pkgname=kdeaddons
 pkgver=3.5.13
 pkgrel=00
 arch=('i686' 'x86_64')
@@ -7,12 +7,12 @@ url="http://trinity.pearsoncomputing.net"
 license=('GPL2')
 groups=('trinity')
 pkgdesc="Trinity - ${pkgname}"
-depends=(kdelibs)
+depends=(kdebase kdegames xmms sdl)
 makedepends=()
 optdepends=()
-options=( )
-install=install
-source=($pkgname-$pkgver.tar.xz)
+options=()
+install=kdeaddons.install
+source=(${pkgname}-${pkgver}.tar.gz)
 
 _prefix=/usr
 _qtdir=/usr/local
@@ -26,7 +26,6 @@ mksource() {
 	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
 	rm -fr ${pkgname}
 }
-
 build() {
 	cd ${srcdir}/${pkgname}
 	cp -f "/usr/share/aclocal/libtool.m4" "admin/libtool.m4.in"
@@ -41,21 +40,16 @@ build() {
 		--with-qt-includes=${_qtdir}/include \
 		--with-qt-libraries=${_qtdir}/lib \
 		--disable-dependency-tracking \
-		--disable-dependency-tracking \
+		--with-{sdl,xmms} \
 		--enable-closure \
 		--disable-rpath
 	make
 }
-
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/${pkgname}
-	install -dm 755 ${pkgdir}/usr/share
-	make DESTDIR="${pkgdir}/" install
-	if [ ${_prefix} != "/usr" ]; then
-		install -vdm 755 ${pkgdir}/usr/lib/pkgconfig
-		ln -vsn ${_prefix}/lib/pkgconfig/system-tools-backends.pc ${pkgdir}/usr/lib/pkgconfig
-	fi
-
-	rm -rf ${pkgdir}${_prefix}/share/doc || true
+	make DESTDIR="$pkgdir/" install
+	rm -rf ${pkgdir}${_prefix}/share/doc
 }
+
+md5sums=('f5fa96a5d99d1bc33600f609881eaee6')

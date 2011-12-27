@@ -1,0 +1,65 @@
+# Maintainer: Baho Utot <baho-utot@columbus.rr.com>
+pkgname=tdenetwork
+pkgver=3.5.13
+pkgrel=01
+arch=('i686' 'x86_64')
+url="http://trinity.pearsoncomputing.net"
+license=('GPL2')
+groups=('trinity')
+pkgdesc="Trinity - ${pkgname}"
+depends=(kdelibs)
+makedepends=( )
+optdepends=()
+options=()
+source=( $_pkgname-$pkgver.tar.gz 
+	kdenetwork-3.5.13-kopete_motionawayplugin_ftbfs.patch
+	kdenetwork-3.5.13-kopete_jabber_protocol.patch
+	kdenetwork-3.5.13-kopete_msn_protocol.patch
+	kdenetwork-3.5.13-kopete_sms_protocol.patch)
+install='kdenetwork.install'
+source=(${pkgname}-${pkgver}.tar.xz)
+
+mksource() {
+	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
+	pushd ${pkgname}
+		git submodule init
+		git submodule update
+		git checkout v3.5.13
+	popd
+	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
+	rm -fr ${pkgname}
+}
+
+
+build() {
+	cd ${srcdir}/${_pkgname}
+	cp -f "/usr/share/aclocal/libtool.m4" "admin/libtool.m4.in"
+	cp -f "/usr/share/libtool/config/ltmain.sh" "admin/ltmain.sh"
+	patch -Np1 -i ${srcdir}/kdenetwork-3.5.13-kopete_motionawayplugin_ftbfs.patch
+	patch -Np1 -i ${srcdir}/kdenetwork-3.5.13-kopete_jabber_protocol.patch
+	patch -Np1 -i ${srcdir}/kdenetwork-3.5.13-kopete_msn_protocol.patch
+	patch -Np1 -i ${srcdir}/kdenetwork-3.5.13-kopete_sms_protocol.patch
+	make -f "Makefile.cvs"
+	./configure prefix=/usr \
+		--sysconfdir=/etc \
+		--libdir=/usr/lib \
+		--mandir=/usr/share/man \
+		--docdir=/usr/share/doc/kde \
+		--disable-dependency-tracking \
+		--enable-closure \
+		--disable-rpath
+	make
+}
+
+package() {
+	msg "Packaging - $pkgname-$pkgver"
+	cd ${srcdir}/${pkgname}
+	make DESTDIR="$pkgdir/" install
+	rm -rf ${pkgdir}/usr/share/doc
+}
+
+md5sums=('349f197c9af4bf0d9b8773f26829415e'
+         '8fc8cd2be5146e3ac79beff7553ae6da'
+         '8504c6f33b6d3afbd99cc03496c74c72'
+         '799eb7c30e36c226b8a08c87d740b34d'
+         'd04057fd17ca228130fc3358bd68cd69')

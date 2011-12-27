@@ -1,0 +1,58 @@
+# Maintainer: Baho Utot <baho-utot@columbus.rr.com>
+pkgname=kdevelop
+pkgver=3.5.13
+pkgrel=00
+arch=('i686' 'x86_64')
+url="http://trinity.pearsoncomputing.net"
+license=('GPL2')
+groups=('trinity')
+pkgdesc="Trinity - ${pkgname}"
+depends=(kdelibs subversion desktop-file-utils python)
+makedepends=(cmake)
+optdepends=(graphviz)
+options=(!docs)
+install=kdevelop.install
+source=(${pkgname}-${pkgver}.tar.gz CMakeLists-repair.patch listeditor-ui.diff)
+
+_prefix=/usr
+mksource() {
+	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
+	pushd ${pkgname}
+		git submodule init
+		git submodule update
+		git checkout v3.5.13
+	popd
+	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
+	rm -fr ${pkgname}
+}
+build() {
+	cd ${srcdir}/${pkgname}
+	patch -Np0 -i ${srcdir}/listeditor-ui.diff
+	patch -Np0 -i ${srcdir}/CMakeLists-repair.patch
+	mkdir -vp ${srcdir}/BUILD
+	cd ${srcdir}/BUILD
+	msg "Starting cmake..."
+	cmake ${srcdir}/${pkgname}/ \
+		-DCMAKE_INSTALL_PREFIX=${_prefix} \
+		-DCMAKE_SKIP_RPATH=ON \
+		-DWITH_BUILDTOOL_AUTOTOOLS=ON \
+		-DWITH_BUILDTOOL_SCRIPT=ON \
+		-DWITH_LANGUAGE_BASH=ON \
+		-DWITH_LANGUAGE_PERL=ON \
+		-DWITH_LANGUAGE_PHP=ON \
+		-DWITH_LANGUAGE_PYTHON=ON \
+		-DWITH_LANGUAGE_SQL=ON \
+		-DWITH_LANGUAGE_CPP=ON \
+		-DWITH_VCS_SUBVERSION=ON \
+		-DBUILD_ALL=ON
+  make
+}
+package() {
+	msg "Packaging - $pkgname-$pkgver"
+	cd ${srcdir}/BUILD
+	make DESTDIR="$pkgdir/" install
+}
+
+md5sums=('777bd77e4f2dc6a5b5b45a370dcf6da0'
+         '9717ba10abc4fa3e127e1d9d4f7ebd26'
+         '90bdeade50bbadd2df626ea711563340')

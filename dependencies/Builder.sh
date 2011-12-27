@@ -7,8 +7,8 @@ _chroot="/home/chroot"
 _date=$(date +%F)"-"$(date +%R)
 _repos="/home/chroot/root/repo"
 _pkgname="*.pkg.tar*"
-#_buildlist=('qt3' 'tqtinterface' 'dbus-tqt' 'dbus-1-tqt' 'arts')
-for i in 'qt3' 'tqtinterface' 'dbus-tqt' 'dbus-1-tqt' 'arts' ; do
+_list=(qt3 tqtinterface dbus-tqt dbus-1-tqt arts)
+for i in ${_list[@]}; do
 	echo ${i}
 	pushd ${i}
 		#echo "In directory --> $(pwd)"
@@ -18,7 +18,7 @@ for i in 'qt3' 'tqtinterface' 'dbus-tqt' 'dbus-1-tqt' 'arts' ; do
 			rm build.log namcap.log filelist.log || true
 			echo "Building---> ${pkgname}-${pkgver}-${pkgrel} ${i}"
 			( sudo /usr/sbin/mkarchroot -u  ${_chroot}/root |& tee	  build.log )
-			( sudo /usr/sbin/makechrootpkg -c -r ${_chroot} |& tee -a build.log )
+			( sudo /usr/sbin/makechrootpkg -c -r ${_chroot} -- --skipinteg |& tee -a build.log )
 			#	Namcap package
 			_pkg=$(echo *.pkg.*)
 			[ -f ${_pkg} ] || ( echo "Missing package: ${_pkgname}";exit 4 )

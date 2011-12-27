@@ -43,6 +43,9 @@ package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/BUILD
 	make DESTDIR="$pkgdir/" install
-	#	Build linker file
+	if [ ${_prefix} != "/usr" ]; then
+		install -vdm 755 ${pkgdir}/usr/lib/pkgconfig
+		ln -vsn ${_prefix}/lib/pkgconfig/system-tools-backends.pc ${pkgdir}/usr/lib/pkgconfig
+	fi
 	rm -rf ${pkgdir}/usr/share/icons/hicolor/index.theme || true
 }

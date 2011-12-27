@@ -13,8 +13,21 @@ optdepends=( )
 options=( )
 provides=(qt3 qt3-enhanced)
 conflicts=(qt3 qt3-enhanced)
-source=(http://anduin.linuxfromscratch.org/sources/trinity/$pkgname-$pkgver.tar.gz)
-#	http://anduin.linuxfromscratch.org/sources/trinity/qt-3.3.8.d-libpng15-1.patch)
+source=(${pkgname}-${pkgver}.tar.xz)
+
+mksource() {
+	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
+	pushd ${pkgname}
+		git submodule init
+		git submodule update
+		git checkout v3.5.13
+	popd
+	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
+	rm -fr ${pkgname}
+}
+
+_prefix=/usr/local
+
 build() {
 	cd "${srcdir}/${pkgname}"
 	export PATH=${PWD}/bin:${PATH}
@@ -36,14 +49,7 @@ build() {
 	rm -rf mkspecs/{*aix*,*bsd*,cygwin*,dgux*,darwin*,hpux*,hurd*,irix*,lynxos*,macx*,qnx*,reliant*,sco*,solaris*,tru64*,unixware*,win32*}
 	msg "Starting configure..."
 	./configure \
-		-prefix /usr \
-		-bindir /usr/bin \
-		-libdir /usr/lib \
-		-docdir /usr/share/doc/qt \
-		-headerdir /usr/include/qt \
-		-plugindir /usr/lib/qt/plugins \
-		-datadir /usr/share/qt \
-		-translationdir /usr/share/qt/translations \
+		-prefix ${_prefix} \
 		-sysconfdir /etc \
 		-qt-gif \
 		-system-zlib \
@@ -58,26 +64,35 @@ build() {
 		-tablet
 	make sub-tools
 }
+#		-bindir ${_prefix}/bin \
+#		-libdir ${_prefix}/lib \
+#		-docdir ${_prefix}/share/doc/qt \
+#		-headerdir ${_prefix}/include/qt \
+#		-plugindir ${_prefix}/lib/qt/plugins \
+#		-datadir ${_prefix}/share/qt \
+#		-translationdir ${_prefix}/share/qt/translations \
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd "${srcdir}/${pkgname}"
 	make INSTALL_ROOT=${pkgdir} install
 	#
 	#	Fixup environment
-	install -vdm 755 		${pkgdir}/usr/share/qt
-	ln -v -sf libqt-mt.so 		${pkgdir}/usr/lib/libqt.so
-	ln -v -snf /usr/bin		${pkgdir}/usr/share/qt/bin
-	ln -v -snf /usr/include/qt	${pkgdir}/usr/share/qt/include
-	ln -v -snf /usr/lib		${pkgdir}/usr/share/qt/lib
-	find ${pkgdir}/usr -type l -name linux-g++ -delete
+	install -vdm 755 			${pkgdir}${_prefix}/share/qt
+	ln -v -sf libqt-mt.so 			${pkgdir}${_prefix}/lib/libqt.so
+#	ln -v -snf ${_prefix}/bin		${pkgdir}${_prefix}/share/qt/bin
+#	ln -v -snf ${_prefix}/include/qt	${pkgdir}${_prefix}/share/qt/include
+#	ln -v -snf ${_prefix}/lib		${pkgdir}${_prefix}/share/qt/lib
+	find ${pkgdir}${_prefix} -type l -name linux-g++ -delete
 	#
 	#	docs and examples
-	#cp -v -r doc/man		${pkgdir}/usr/share
-	#cp -v -r examples		${pkgdir}/usr/share/doc/qt
+	#cp -v -r doc/man		${pkgdir}${_prefix}/share
+	#cp -v -r examples		${pkgdir}${_prefix}/share/doc/qt
 	#
 	#	Fixup linker search path
 	install -vdm 0755 		${pkgdir}/etc/ld.so.conf.d
-	echo "/usr/lib" > 		${pkgdir}/etc/ld.so.conf.d/qt3.conf
+	echo "${_prefix}/lib" > 	${pkgdir}/etc/ld.so.conf.d/qt3.conf
+	#	Fixup pkgconfig file
+	install -vdm 755 ${pkgdir}/usr/lib/pkgconfig
+	ln -vsnf ${_prefix}/lib/pkgconfig/qt-mt.pc ${pkgdir}/usr/lib/pkgconfig
 }
 md5sums=('78dc675e84aed595375449818cbb589a')
-

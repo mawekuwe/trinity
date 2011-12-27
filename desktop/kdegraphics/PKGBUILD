@@ -1,21 +1,20 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-pkgname=<PKGNAME>
+pkgname=tdegraphics
 pkgver=3.5.13
-pkgrel=00
+pkgrel=01
 arch=('i686' 'x86_64')
 url="http://trinity.pearsoncomputing.net"
 license=('GPL2')
 groups=('trinity')
 pkgdesc="Trinity - ${pkgname}"
-depends=(kdelibs)
-makedepends=()
-optdepends=()
-options=( )
-install=install
-source=($pkgname-$pkgver.tar.xz)
+depends=(kdelibs poppler-qt3 )
+#libgphoto2 lcms fribidi imlib sane desktop-file-utils  hicolor-icon-theme
+makedepends=(cmake)
+optdepends=( )
+install='kdegraphics.install'
+options=(!makeflags)
+source=(${pkgname}-${pkgver}.tar.xz)
 
-_prefix=/usr
-_qtdir=/usr/local
 mksource() {
 	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
 	pushd ${pkgname}
@@ -32,15 +31,11 @@ build() {
 	cp -f "/usr/share/aclocal/libtool.m4" "admin/libtool.m4.in"
 	cp -f "/usr/share/libtool/config/ltmain.sh" "admin/ltmain.sh"
 	make -f "Makefile.cvs"
-	./configure prefix=${_prefix} \
+	./configure prefix=/usr \
 		--sysconfdir=/etc \
-		--libdir=${_prefix}/lib \
-		--mandir=${_prefix}/share/man \
-		--docdir=${_prefix}/share/doc/kde \
-		--with-qt-dir=${_qtdir} \
-		--with-qt-includes=${_qtdir}/include \
-		--with-qt-libraries=${_qtdir}/lib \
-		--disable-dependency-tracking \
+		--libdir=/usr/lib \
+		--mandir=/usr/share/man \
+		--docdir=/usr/share/doc/kde \
 		--disable-dependency-tracking \
 		--enable-closure \
 		--disable-rpath
@@ -50,12 +45,7 @@ build() {
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/${pkgname}
-	install -dm 755 ${pkgdir}/usr/share
-	make DESTDIR="${pkgdir}/" install
-	if [ ${_prefix} != "/usr" ]; then
-		install -vdm 755 ${pkgdir}/usr/lib/pkgconfig
-		ln -vsn ${_prefix}/lib/pkgconfig/system-tools-backends.pc ${pkgdir}/usr/lib/pkgconfig
-	fi
-
-	rm -rf ${pkgdir}${_prefix}/share/doc || true
+	make DESTDIR="$pkgdir/" install
+	rm -rf ${pkgdir}/usr/share/doc
 }
+md5sums=('a75c254cd1060343cd04c6744bce6798')

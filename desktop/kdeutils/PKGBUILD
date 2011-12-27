@@ -1,5 +1,5 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-pkgname=<PKGNAME>
+pkgname=kdeutils
 pkgver=3.5.13
 pkgrel=00
 arch=('i686' 'x86_64')
@@ -7,15 +7,14 @@ url="http://trinity.pearsoncomputing.net"
 license=('GPL2')
 groups=('trinity')
 pkgdesc="Trinity - ${pkgname}"
-depends=(kdelibs)
+depends=(kdelibs libxtst desktop-file-utils)
 makedepends=()
 optdepends=()
-options=( )
-install=install
-source=($pkgname-$pkgver.tar.xz)
+options=()
+install=kdeutils.install
+source=(${pkgname}-${pkgver}.tar.gz)
 
 _prefix=/usr
-_qtdir=/usr/local
 mksource() {
 	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
 	pushd ${pkgname}
@@ -37,10 +36,6 @@ build() {
 		--libdir=${_prefix}/lib \
 		--mandir=${_prefix}/share/man \
 		--docdir=${_prefix}/share/doc/kde \
-		--with-qt-dir=${_qtdir} \
-		--with-qt-includes=${_qtdir}/include \
-		--with-qt-libraries=${_qtdir}/lib \
-		--disable-dependency-tracking \
 		--disable-dependency-tracking \
 		--enable-closure \
 		--disable-rpath
@@ -50,12 +45,8 @@ build() {
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/${pkgname}
-	install -dm 755 ${pkgdir}/usr/share
-	make DESTDIR="${pkgdir}/" install
-	if [ ${_prefix} != "/usr" ]; then
-		install -vdm 755 ${pkgdir}/usr/lib/pkgconfig
-		ln -vsn ${_prefix}/lib/pkgconfig/system-tools-backends.pc ${pkgdir}/usr/lib/pkgconfig
-	fi
-
-	rm -rf ${pkgdir}${_prefix}/share/doc || true
+	install -dm 755 ${pkgdir}${_prefix}/share
+	make DESTDIR="$pkgdir/" install
+	rm -rf ${pkgdir}${_prefix}/share/doc
 }
+md5sums=('e2cd6695606c5c91b3380dcc7f1a6a83')

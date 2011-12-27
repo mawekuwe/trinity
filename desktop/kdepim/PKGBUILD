@@ -1,16 +1,19 @@
+ # $Id$
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-pkgname=dbus-1-tqt
+pkgname=kdepim
 pkgver=3.5.13
-pkgrel=00
-arch=(i686 x86_64)
+pkgrel=01
+arch=('i686' 'x86_64')
 url="http://trinity.pearsoncomputing.net"
-license=(GPL2)
-groups=(trinity)
+license=('GPL2')
+groups=('trinity')
 pkgdesc="Trinity - ${pkgname}"
-depends=(tqtinterface dbus-core)
+depends=(gpgme libical desktop-file-utils kdelibs boost)
 makedepends=(cmake)
-options=()
-source=(${pkgname}-${pkgver}.tar.xz)
+optdepends=( )
+options=(!makeflags)
+install='kdepim.install'
+source=(${pkgname}-${pkgver}.tar.gz)
 
 _prefix=/usr
 mksource() {
@@ -25,12 +28,14 @@ mksource() {
 }
 
 build() {
-	msg "Building revision $pkgver"
 	mkdir -vp ${srcdir}/BUILD
 	cd ${srcdir}/BUILD
 	msg "Starting cmake..."
 	cmake ${srcdir}/${pkgname}/ \
 		-DCMAKE_INSTALL_PREFIX=${_prefix} \
+		-DBUILD_ALL=ON \
+		-DWITH_SASL=ON \
+		-DWITH_ARTS=ON \
 		-DCMAKE_SKIP_RPATH=ON
 	make
 }
@@ -39,5 +44,6 @@ package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/BUILD
 	make DESTDIR="$pkgdir/" install
+	rm -rf ${pkgdir}${_prefix}/share/doc
 }
-md5sums=('a7ba1071f4bf7b5930f805b4036f8a97')
+md5sums=('4488062d5400bdd99642fe0b72ebcf9a')

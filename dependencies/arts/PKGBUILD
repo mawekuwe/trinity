@@ -10,14 +10,27 @@ pkgdesc="Trinity - ${pkgname}"
 depends=(glib2 libmad libvorbis audiofile tqtinterface bash)
 makedepends=(cmake)
 options=()
-source=( http://anduin.linuxfromscratch.org/sources/trinity/$pkgname-$pkgver.tar.gz)
+source=(${pkgname}-${pkgver}.tar.xz)
+
+_prefix=/usr
+mksource() {
+	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
+	pushd ${pkgname}
+		git submodule init
+		git submodule update
+		git checkout v3.5.13
+	popd
+	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
+	rm -fr ${pkgname}
+}
+
 build() {
 	msg "Building revision $pkgver"
 	mkdir -vp ${srcdir}/BUILD
 	cd ${srcdir}/BUILD
 	msg "Starting cmake..."
-	cmake ${srcdir}/dependencies/${pkgname}/ \
-		-DCMAKE_INSTALL_PREFIX=/usr \
+	cmake ${srcdir}/${pkgname}/ \
+		-DCMAKE_INSTALL_PREFIX=${_prefix} \
 		-DCMAKE_SKIP_RPATH=OFF
 	make
 }

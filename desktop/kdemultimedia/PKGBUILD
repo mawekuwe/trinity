@@ -1,5 +1,5 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-pkgname=<PKGNAME>
+pkgname=kdemultimedia
 pkgver=3.5.13
 pkgrel=00
 arch=('i686' 'x86_64')
@@ -7,15 +7,14 @@ url="http://trinity.pearsoncomputing.net"
 license=('GPL2')
 groups=('trinity')
 pkgdesc="Trinity - ${pkgname}"
-depends=(kdelibs)
-makedepends=()
+depends=(kdelibs desktop-file-utils)
+makedepends=(cmake)
 optdepends=()
-options=( )
-install=install
-source=($pkgname-$pkgver.tar.xz)
+options=(!makeflags)
+install=kdemultimedia.install
+source=(${pkgname}-${pkgver}.tar.gz)
 
 _prefix=/usr
-_qtdir=/usr/local
 mksource() {
 	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
 	pushd ${pkgname}
@@ -26,7 +25,6 @@ mksource() {
 	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
 	rm -fr ${pkgname}
 }
-
 build() {
 	cd ${srcdir}/${pkgname}
 	cp -f "/usr/share/aclocal/libtool.m4" "admin/libtool.m4.in"
@@ -37,25 +35,16 @@ build() {
 		--libdir=${_prefix}/lib \
 		--mandir=${_prefix}/share/man \
 		--docdir=${_prefix}/share/doc/kde \
-		--with-qt-dir=${_qtdir} \
-		--with-qt-includes=${_qtdir}/include \
-		--with-qt-libraries=${_qtdir}/lib \
-		--disable-dependency-tracking \
 		--disable-dependency-tracking \
 		--enable-closure \
 		--disable-rpath
 	make
 }
-
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/${pkgname}
-	install -dm 755 ${pkgdir}/usr/share
-	make DESTDIR="${pkgdir}/" install
-	if [ ${_prefix} != "/usr" ]; then
-		install -vdm 755 ${pkgdir}/usr/lib/pkgconfig
-		ln -vsn ${_prefix}/lib/pkgconfig/system-tools-backends.pc ${pkgdir}/usr/lib/pkgconfig
-	fi
-
-	rm -rf ${pkgdir}${_prefix}/share/doc || true
+	install -dm 755 ${pkgdir}${_prefix}/share
+	make DESTDIR="$pkgdir/" install
+	rm -rf ${pkgdir}${_prefix}/share/doc
 }
+md5sums=('6d906b8a8fd0928e01ecd600175381c0')

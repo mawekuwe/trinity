@@ -1,16 +1,18 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-pkgname=dbus-1-tqt
+pkgname=kdewebdev
 pkgver=3.5.13
 pkgrel=00
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 url="http://trinity.pearsoncomputing.net"
-license=(GPL2)
-groups=(trinity)
+license=('GPL2')
+groups=('trinity')
 pkgdesc="Trinity - ${pkgname}"
-depends=(tqtinterface dbus-core)
+source=(${pkgname}-${pkgver}.tar.gz kdewebdev.patch)
+depends=(kdelibs desktop-file-utils)
 makedepends=(cmake)
+optdepends=()
 options=()
-source=(${pkgname}-${pkgver}.tar.xz)
+install=install
 
 _prefix=/usr
 mksource() {
@@ -27,17 +29,18 @@ mksource() {
 build() {
 	msg "Building revision $pkgver"
 	mkdir -vp ${srcdir}/BUILD
+	patch -Np1 -i ${srcdir}/kdewebdev.patch
 	cd ${srcdir}/BUILD
 	msg "Starting cmake..."
 	cmake ${srcdir}/${pkgname}/ \
 		-DCMAKE_INSTALL_PREFIX=${_prefix} \
-		-DCMAKE_SKIP_RPATH=ON
+		-DSYSCONF_INSTALL_DIR=/etc \
+		-DBUILD_ALL=ON
 	make
 }
-
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/BUILD
 	make DESTDIR="$pkgdir/" install
+	rm -rf ${pkgdir}/usr/share/icons/hicolor/index.theme || true
 }
-md5sums=('a7ba1071f4bf7b5930f805b4036f8a97')
