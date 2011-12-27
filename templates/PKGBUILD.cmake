@@ -15,18 +15,7 @@ makedepends=(cmake)
 optdepends=('pmount: mount removable devices as normal user')
 options=()
 install=install
-_trinity.sh() {
-	#	Build trinity.sh
-	install -d -m755 ${pkgdir}/etc/profile.d/
-	echo "export KDEDIR=/usr" > ${pkgdir}/etc/profile.d/trinity.sh
-	echo 'export KDEDIRS=/usr' >> ${pkgdir}/etc/profile.d/trinity.sh
-	echo 'PATH=${KDEDIR}/bin:${PATH:=}' >> ${pkgdir}/etc/profile.d/trinity.sh
-	echo 'PATH=${PATH%:}' >> ${pkgdir}/etc/profile.d/trinity.sh
-	echo 'XDG_DATA_DIRS=${KDEDIR}/share:${XDG_DATA_DIRS:=}' >> ${pkgdir}/etc/profile.d/trinity.sh
-	echo 'XDG_DATA_DIRS=${XDG_DATA_DIRS%:}' >> ${pkgdir}/etc/profile.d/trinity.sh
-	echo 'XDG_CONFIG_DIRS=${KDEDIR}/etc/xdg:${XDG_CONFIG_DIRS:=}' >> ${pkgdir}/etc/profile.d/trinity.sh
-	echo 'XDG_CONFIG_DIRS=${XDG_CONFIG_DIRS%:}' >> ${pkgdir}/etc/profile.d/trinity.sh
-}
+_prefix=/usr
 
 mksource() {
 	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
@@ -41,19 +30,12 @@ mksource() {
 
 build() {
 	msg "Building revision $pkgver"
-	export KDECONFIG=kde-config
 	mkdir -vp ${srcdir}/BUILD
 	cd ${srcdir}/BUILD
 	msg "Starting cmake..."
 	cmake ${srcdir}/${pkgname}/ \
-		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_PREFIX=${_prefix} \
 		-DSYSCONF_INSTALL_DIR=/etc \
-		-DWITH_LIBART=ON \
-		-DWITH_TIFF=ON \
-		-DWITH_JASPER=ON \
-		-DWITH_OPENEXR=ON \
-		-DWITH_ASPELL=ON \
-		-DWITH_UTEMPTER=OFF \
 		-DBUILD_ALL=ON
 	make
 }
@@ -62,9 +44,5 @@ package() {
 	cd ${srcdir}/BUILD
 	make DESTDIR="$pkgdir/" install
 	#	Build linker file
-	install -d -m755 ${pkgdir}/etc/ld.so.conf.d/
-	echo "/usr/lib" > ${pkgdir}/etc/ld.so.conf.d/${pkgname}.conf
-	_trinity.sh
-	rm -rf ${pkgdir}/usr/share/icons/hicolor/index.theme
-	rm -rf ${pkgdir}/usr/share/doc/kde/HTML/en/kspell/common
+	rm -rf ${pkgdir}/usr/share/icons/hicolor/index.theme || true
 }

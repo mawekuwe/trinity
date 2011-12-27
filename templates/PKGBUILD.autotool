@@ -1,5 +1,5 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-pkgname=tdetoys
+pkgname=<PKGNAME>
 pkgver=3.5.13
 pkgrel=00
 arch=('i686' 'x86_64')
@@ -7,13 +7,13 @@ url="http://trinity.pearsoncomputing.net"
 license=('GPL2')
 groups=('trinity')
 pkgdesc="Trinity - ${pkgname}"
-depends=(tdelibs)
+depends=(kdelibs)
 makedepends=()
 optdepends=()
 options=( )
 install=install
 source=($pkgname-$pkgver.tar.xz)
-
+_prefix=/usr
 mksource() {
 	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
 	pushd ${pkgname}
@@ -30,11 +30,11 @@ build() {
 	cp -f "/usr/share/aclocal/libtool.m4" "admin/libtool.m4.in"
 	cp -f "/usr/share/libtool/config/ltmain.sh" "admin/ltmain.sh"
 	make -f "Makefile.cvs"
-	./configure prefix=/usr \
+	./configure prefix=${_prefix} \
 		--sysconfdir=/etc \
-		--libdir=/usr/lib \
-		--mandir=/usr/share/man \
-		--docdir=/usr/share/doc/kde \
+		--libdir=${_prefix}/lib \
+		--mandir=${_prefix}/share/man \
+		--docdir=${_prefix}/share/doc/kde \
 		--disable-dependency-tracking \
 		--enable-closure \
 		--disable-rpath
@@ -46,5 +46,5 @@ package() {
 	cd ${srcdir}/${pkgname}
 	install -dm 755 ${pkgdir}/usr/share
 	make DESTDIR="${pkgdir}/" install
-	rm -rf ${pkgdir}/usr/share/doc
+	rm -rf ${pkgdir}${_prefix}/share/doc || true
 }
