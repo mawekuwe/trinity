@@ -7,8 +7,8 @@ _chroot="/home/chroot"
 _date=$(date +%F)"-"$(date +%R)
 _repos="/home/chroot/root/repo"
 _pkgname="*.pkg.tar*"
-_broken=(tdebindings tdenetwork tdegraphics tdewebdev)
-_list=(kdelibs kdebase kdeaccessibility kdeutils kdemultimedia kdeadmin kdeartwork kdegames kdetoys kdeedu kdepim kdesdk kdeaddons kdevelop kdewebdev) # kdenetwork) # kdegraphics)
+_broken=(tdebindings tdenetwork tdegraphics)
+_list=(kdelibs kdebase kdeaccessibility kdeutils kdemultimedia kdeadmin kdeartwork kdegames kdetoys kdeedu kdepim kdesdk kdeaddons kdevelop kdewebdev kdegraphics) # kdenetwork) # kdegraphics)
 for i in ${_list[@]}; do
 	echo ${i}
 	pushd ${i}
