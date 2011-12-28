@@ -13,6 +13,7 @@ optdepends=()
 options=( )
 #install=install
 source=($pkgname-$pkgver.tar.gz)
+
 _prefix=/usr
 mksource() {
 	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
@@ -24,7 +25,6 @@ mksource() {
 	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
 	rm -fr ${pkgname}
 }
-
 build() {
 	cd ${srcdir}/applications/${pkgname}
 	cp -f "/usr/share/aclocal/libtool.m4" "admin/libtool.m4.in"
@@ -40,7 +40,6 @@ build() {
 		--disable-rpath
 	make
 }
-
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/applications/${pkgname}

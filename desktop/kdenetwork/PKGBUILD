@@ -1,24 +1,24 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
-pkgname=tdenetwork
+pkgname=kdenetwork
 pkgver=3.5.13
-pkgrel=01
+pkgrel=00
 arch=('i686' 'x86_64')
 url="http://trinity.pearsoncomputing.net"
 license=('GPL2')
 groups=('trinity')
 pkgdesc="Trinity - ${pkgname}"
-depends=(kdelibs)
-makedepends=( )
+depends=(kdelibs sqlite3 desktop-file-utils libxtst)
+makedepends=(v4l-utils libgadu)
 optdepends=()
-options=()
-source=( $_pkgname-$pkgver.tar.gz 
+options=(!makeflags)
+source=( $pkgname-$pkgver.tar.gz 
 	kdenetwork-3.5.13-kopete_motionawayplugin_ftbfs.patch
 	kdenetwork-3.5.13-kopete_jabber_protocol.patch
 	kdenetwork-3.5.13-kopete_msn_protocol.patch
 	kdenetwork-3.5.13-kopete_sms_protocol.patch)
 install='kdenetwork.install'
-source=(${pkgname}-${pkgver}.tar.xz)
 
+_prefix=/usr
 mksource() {
 	git clone http://scm.trinitydesktop.org/scm/git/${pkgname}
 	pushd ${pkgname}
@@ -29,10 +29,8 @@ mksource() {
 	tar -cvJf ${pkgname}-${pkgver}.tar.xz ${pkgname}/*
 	rm -fr ${pkgname}
 }
-
-
 build() {
-	cd ${srcdir}/${_pkgname}
+	cd ${srcdir}/${pkgname}
 	cp -f "/usr/share/aclocal/libtool.m4" "admin/libtool.m4.in"
 	cp -f "/usr/share/libtool/config/ltmain.sh" "admin/ltmain.sh"
 	patch -Np1 -i ${srcdir}/kdenetwork-3.5.13-kopete_motionawayplugin_ftbfs.patch
@@ -40,22 +38,22 @@ build() {
 	patch -Np1 -i ${srcdir}/kdenetwork-3.5.13-kopete_msn_protocol.patch
 	patch -Np1 -i ${srcdir}/kdenetwork-3.5.13-kopete_sms_protocol.patch
 	make -f "Makefile.cvs"
-	./configure prefix=/usr \
+	./configure prefix=${_prefix} \
 		--sysconfdir=/etc \
-		--libdir=/usr/lib \
-		--mandir=/usr/share/man \
-		--docdir=/usr/share/doc/kde \
+		--libdir=${_prefix}/lib \
+		--mandir=${_prefix}/share/man \
+		--docdir=${_prefix}/share/doc/kde \
 		--disable-dependency-tracking \
 		--enable-closure \
-		--disable-rpath
+		--disable-rpath \
+		--without-kopete
 	make
 }
-
 package() {
 	msg "Packaging - $pkgname-$pkgver"
 	cd ${srcdir}/${pkgname}
 	make DESTDIR="$pkgdir/" install
-	rm -rf ${pkgdir}/usr/share/doc
+	rm -rf ${pkgdir}${_prefix}/share/doc
 }
 
 md5sums=('349f197c9af4bf0d9b8773f26829415e'
