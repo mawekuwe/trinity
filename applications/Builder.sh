@@ -7,7 +7,7 @@ _chroot="/home/chroot"
 _date=$(date +%F)"-"$(date +%R)
 _repos="/home/chroot/root/repo"
 _pkgname="*.pkg.tar*"
-_list=(keepassx) #amarok)
+_list=(adept)  # abakus) # amarok) # keepassx)
 for i in ${_list[@]}; do
 	echo ${i}
 	pushd ${i}

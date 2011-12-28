@@ -2,7 +2,7 @@
 # Maintainer: Baho Utot <baho-utot@columbus.rr.com>
 pkgname=kdepim
 pkgver=3.5.13
-pkgrel=01
+pkgrel=00
 arch=('i686' 'x86_64')
 url="http://trinity.pearsoncomputing.net"
 license=('GPL2')
@@ -11,7 +11,7 @@ pkgdesc="Trinity - ${pkgname}"
 depends=(gpgme libical desktop-file-utils kdelibs boost)
 makedepends=(cmake)
 optdepends=( )
-options=(!makeflags)
+#options=(!makeflags)
 install='kdepim.install'
 source=(${pkgname}-${pkgver}.tar.gz)
 
